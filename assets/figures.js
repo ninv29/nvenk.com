@@ -241,6 +241,7 @@
         if (!c.state) c.state = { a: a, sc: scl, r: c.target.r };
       });
       put(fig, "[data-stat=pods]", left);
+      btns[0].lastElementChild.textContent = left.toLocaleString();
       put(fig, "[data-stat=gloms]", affected);
     }
 
