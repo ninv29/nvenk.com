@@ -660,7 +660,7 @@
   // Photo carousel. Offsets are in photos from the center. Photos are one size until hovered.
   function Reel(reel) {
     var shots = $$(".shot", reel), imgs = shots.map(function (shot) { return $("img", shot); }), N = shots.length;
-    var GAP = 8, SPEED = reduceMotion ? 0 : 0.12, GROW = 0.25, GRID_GROW = 0.05, REST = 0.8, DWELL = 320, ROWS = [2, 2, 2, 2];
+    var GAP = 8, SPEED = reduceMotion ? 0 : 0.12, GROW = 0.25, GRID_GROW = 0.05, REST = 0.8, DWELL = 320, ROWS = Array.from({ length: Math.ceil(N / 2) }, function (_, r) { return Math.min(2, N - 2 * r); });
     var SLIDE = reduceMotion ? 1 : 780, STAGGER = reduceMotion ? 0 : 56, TOTAL = SLIDE + STAGGER * (N - 1);
     var at = 4, v = SPEED, W = 0, last = 0, mouse = null, target = null, pending = -1, pendingSince = 0;
     var grid = false, gridHover = -1, change = null, frozen = false, slots = [], gridHeight = 0;
