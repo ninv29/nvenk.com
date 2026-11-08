@@ -676,7 +676,7 @@
       var C = reel.clientWidth, top = 0, n = 0;
       slots = [];
       ROWS.forEach(function (count) {
-        var w = (C - (count - 1) * GAP) / count, h = w * 0.75;
+        var w = (C - GAP) / 2, h = w * 0.75;
         for (var c = 0; c < count; c++, n++) {
           slots.push({ x: c * (w + GAP) + w / 2 - C / 2, y: top + h / 2 - W * 0.375, s: REST * w / W });
         }
