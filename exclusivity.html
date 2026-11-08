@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Drug exclusivity | Nithin Venkatramanan</title>
+  <meta name="description" content="An interactive model of when a generic drug can launch.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Drug exclusivity">
+  <meta property="og:description" content="An interactive model of when a generic drug can launch.">
+  <meta property="og:image" content="https://nvenk.com/assets/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="favicon.svg?v=nv2" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400..500&display=swap">
+  <link rel="stylesheet" href="assets/site.css?v=23">
+  <script src="assets/figures.js?v=23" defer></script>
+</head>
+<body>
+  <main class="page">
+    <a class="back" href="./" data-back><span aria-hidden="true">&larr;</span> Back</a>
+    <h1 class="fig-title">Drug exclusivity</h1>
+    <p class="lead">A generic drug can launch once the brand drug&rsquo;s patent and FDA exclusivities have all run out. This is a simplified model for one hypothetical drug.</p>
+    <figure class="fig xfig" data-fig="exclusivity">
+      <div class="plate">
+        <div class="xgrid">
+          <div class="xlines" data-lines></div>
+          <div class="xrow" data-row="dev"><span>Development</span><div class="xtrack"><span class="xseg dev" data-seg="dev"></span></div></div>
+          <div class="xrow" data-row="patent"><span>Patent</span><div class="xtrack"><span class="xseg base" data-seg="patent"></span><span class="xseg pte" data-seg="pte"></span><span class="xseg ped" data-seg="patent-ped"></span></div></div>
+          <div class="xrow" data-row="nce"><span>NCE exclusivity</span><div class="xtrack"><span class="xseg base" data-seg="nce"></span><span class="xseg gain" data-seg="nce-gain"></span><span class="xseg ped" data-seg="nce-ped"></span></div></div>
+          <div class="xrow" data-row="orphan"><span>Orphan exclusivity</span><div class="xtrack"><span class="xseg base" data-seg="orphan"></span><span class="xseg gain" data-seg="orphan-gain"></span><span class="xseg ped" data-seg="orphan-ped"></span></div></div>
+        </div>
+        <div class="xaxis" data-axis></div>
+      </div>
+      <div class="controls">
+        <label class="ctl"><span>Patent filed before approval</span><input type="range" min="4" max="14" value="10" step="0.5" data-dev><output data-dev-out>10 years</output></label>
+        <div class="checks">
+          <label><input type="checkbox" data-opt="pte" checked> Patent term extension <i class="sw sw-pte"></i></label>
+          <label><input type="checkbox" data-opt="orphan"> Orphan drug</label>
+          <label><input type="checkbox" data-opt="ped"> Pediatric studies <i class="sw sw-ped"></i></label>
+          <label><input type="checkbox" data-opt="gain"> QIDP <i class="sw sw-gain"></i></label>
+        </div>
+      </div>
+      <div class="stats">
+        <div><span class="stat-n"><span data-stat="entry">0.0</span><small>years</small></span><span class="stat-l">until a generic can launch</span></div>
+        <div><span class="stat-n" data-stat="bind">Patent</span><span class="stat-l">ends last</span></div>
+      </div>
+    </figure>
+  </main>
+</body>
+</html>
