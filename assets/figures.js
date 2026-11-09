@@ -1014,7 +1014,11 @@
   // Escape on an inner page goes home, once anything open on top has been closed first.
   var homeLink = $("[data-back]");
   if (homeLink) document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && !e.defaultPrevented && !$("dialog[open]")) homeLink.click();
+    // A dialog loses .on as soon as it starts closing, so a press during that animation counts.
+    if (e.key !== "Escape" || e.repeat || e.defaultPrevented || $("dialog[open].on")) return;
+    // Escape is also the browser's Stop key, which would cancel the trip home.
+    e.preventDefault();
+    homeLink.click();
   });
 
   // Back link: return to the previous page (keeping its scroll position) when it was this site.
