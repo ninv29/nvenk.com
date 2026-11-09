@@ -972,6 +972,8 @@
       var ms = Math.min(Math.max(0, now - last), 24);
       last = now;
       t = unit(t + dir * ms / (dir > 0 ? OPEN : CLOSE));
+      // The background holds its color until the last stretch of the fold, then fades as it faded in.
+      if (dir < 0 && t * CLOSE <= 320) box.classList.remove("on");
       draw();
       if ((dir > 0 && t === 1) || (dir < 0 && t === 0)) done();
       else raf = requestAnimationFrame(step);
@@ -999,7 +1001,6 @@
     }
     function close() {
       if (!box.open || dir < 0) return;
-      box.classList.remove("on");
       run(-1);
     }
     link.addEventListener("click", function (e) {
