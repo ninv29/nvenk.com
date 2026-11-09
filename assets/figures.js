@@ -643,7 +643,7 @@
         if (!pinned && String(window.getSelection()) === "") { pinned = true; apply(); }
       });
       closers.push(function (e) {
-        if (e.type === "click" && day.contains(e.target)) return;
+        if (e.type === "click" && days.some(function (d) { return d.contains(e.target); })) return;
         pinned = false;
         if (e.type === "keydown") hovering = false;
         apply();
