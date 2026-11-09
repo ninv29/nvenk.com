@@ -644,17 +644,18 @@
       });
       closers.push(function (e) {
         if (e.type === "click" && days.some(function (d) { return d.contains(e.target); })) return;
+        var held = pinned;
         pinned = false;
         if (e.type === "keydown") hovering = false;
         apply();
+        return held;
       });
     });
     document.addEventListener("click", function (e) { closers.forEach(function (close) { close(e); }); });
     document.addEventListener("keydown", function (e) {
       if (e.key !== "Escape") return;
-      // An open piece takes this press, so the next one is what leaves the page.
-      if ($(".day-head[aria-expanded=\"true\"]", list)) e.preventDefault();
-      closers.forEach(function (close) { close(e); });
+      // A held-open piece takes this press, so the next one is what leaves the page.
+      if (closers.map(function (close) { return close(e); }).some(Boolean)) e.preventDefault();
     });
   });
 
