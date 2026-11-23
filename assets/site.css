@@ -117,6 +117,9 @@ canvas, .plate svg { animation: appear .24s var(--ease); }
    italic copy. On hover the slot eases to the italic letter's width while the copies crossfade and lean together;
    the incoming copy fades in faster than the outgoing one fades out, so the letter never looks faint. */
 .lean { display: inline-block; position: relative; white-space: nowrap; text-decoration: inherit; }
+/* The hover area keeps the upright word's width while the italic one is narrower, so a cursor near the right edge
+   doesn't see the word shrink out from under it and flick back and forth. */
+.lean::after, .rot a::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: var(--w-hit, 100%); }
 /* The underline layer's letters are transparent, so its underline takes the link's color from figures.js. */
 .lean-line { position: absolute; left: 0; top: 0; color: transparent; white-space: pre; text-decoration: inherit; pointer-events: none; transform-origin: 0 0; transition: transform .45s var(--ease-out), text-decoration-color .2s var(--ease); }
 [data-lean]:hover .lean-line, [data-lean][aria-expanded="true"] .lean-line { text-decoration-color: var(--lean-ink); }

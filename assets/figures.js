@@ -1076,6 +1076,7 @@
         g.style.setProperty("--a-it", it.step[i] + "px");
       });
       box.style.setProperty("--to-it", it.total / up.total);
+      box.style.setProperty("--w-hit", Math.max(up.total, it.total) + "px");
       box.style.setProperty("--lean-ink", getComputedStyle(el).color);
       box.style.marginRight = after.trim() ? widthOf(text + after) - up.total - widthOf(after) + "px" : "";
       void box.offsetWidth;
@@ -1159,6 +1160,9 @@
     ["pointerleave", "focusout"].forEach(function (ev) { wrap.addEventListener(ev, function () { paused = false; }); });
     // Under the cursor, the letters turn italic the same way as the other links (styles in site.css).
     function lean(on) {
+      // Keep the hover area at the upright width while the word is italic (see site.css).
+      if (on) a.style.setProperty("--w-hit", widthIn(PLATFORMS[idx].label, false) + "px");
+      else a.style.removeProperty("--w-hit");
       a.classList.toggle("lean-on", on);
       fit();
     }
