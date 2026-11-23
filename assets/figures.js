@@ -1,4 +1,4 @@
-/* figures.js: the home page figure, the three interactive figures, the rotating contact link, the bio notes, the photo carousel, the back link, and the footer clock.
+/* figures.js: the home page figure, the three interactive figures, the rotating contact link, the bio notes, the photo carousel, the back link, page transitions, and the footer clock.
    All data here is synthetic and generated in the browser. */
 (function () {
   "use strict";
@@ -560,7 +560,7 @@
     state.settle = setTimeout(function () {
       el.style.height = "";
       el.hidden = !state.open;
-    }, 260);
+    }, 460);
   }
 
   // Notes that open as small sub-paragraphs under a word in the bio.
@@ -976,10 +976,31 @@
   $$("[data-back]").forEach(function (a) {
     a.addEventListener("click", function (e) {
       try {
-        if (history.length > 1 && document.referrer && new URL(document.referrer).origin === location.origin) { e.preventDefault(); history.back(); }
+        if (history.length > 1 && document.referrer && new URL(document.referrer).origin === location.origin) { e.preventDefault(); leave(function () { history.back(); }); }
       } catch (err) {}
     });
   });
+
+  // Page transitions. Browsers with cross-page view transitions crossfade by themselves (see site.css);
+  // the rest fade the page out briefly here before going to the other page on this site.
+  var crossfades = "onpagereveal" in window;
+  function leave(go) {
+    if (crossfades || reduceMotion) { go(); return; }
+    document.documentElement.classList.add("leaving");
+    setTimeout(go, 200);
+  }
+  document.addEventListener("click", function (e) {
+    if (crossfades || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest("a[href]");
+    if (!a || a.target || a.hasAttribute("download")) return;
+    var url = new URL(a.href, location.href);
+    if (url.origin !== location.origin || !/(\.html|\/)$/.test(url.pathname)) return;
+    if (url.pathname === location.pathname && url.search === location.search) return;
+    e.preventDefault();
+    leave(function () { location.href = url.href; });
+  });
+  // Coming back with the browser's Back button can restore the faded-out page, so bring it back in.
+  window.addEventListener("pageshow", function (e) { if (e.persisted) document.documentElement.classList.remove("leaving"); });
 
   // footer clock, Providence time, ticking on the second
   var clock = $("[data-clock]");
