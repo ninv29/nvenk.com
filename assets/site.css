@@ -30,8 +30,6 @@
   --type-heading: 500 16px/24px var(--serif);
   --type-prose: 400 16px/24px var(--serif);
   --type-body: 400 14px/22px var(--sans);
-  --type-reading: 400 16px/26px var(--sans);
-  --type-dateline: 400 15px/24px var(--sans);
   --type-small: 400 12px/20px var(--sans);
 
   --ease: cubic-bezier(.2, .7, .2, 1);
@@ -179,20 +177,6 @@ input[type="checkbox"] { width: 16px; height: 16px; margin: 0; cursor: pointer; 
 .lightbox.on { background: rgba(0, 0, 0, .8); }
 .lightbox:focus { outline: none; }
 .lightbox img { display: block; width: min(90vw, calc(88vh * 4 / 3)); height: auto; aspect-ratio: 4 / 3; cursor: default; will-change: transform; }
-
-/* writings */
-.days { list-style: none; margin: 24px 0 0; padding: 0; }
-.day-head { display: block; width: 100%; padding: 8px 0; border: 0; background: none; font: var(--type-prose); color: var(--ink-2); text-align: left; cursor: pointer; }
-.day-date { font: var(--type-dateline); }
-.day-title { font-weight: 500; color: var(--ink); text-decoration: underline 1px; text-underline-offset: 3px; text-decoration-color: var(--line); transition: text-decoration-color .2s var(--ease); }
-.day-num { font: var(--type-dateline); color: var(--muted); font-variant-numeric: tabular-nums; }
-.day-head[aria-expanded="true"] .day-title { text-decoration-color: currentColor; }
-.day-body { overflow: hidden; color: var(--ink-2); opacity: 0; transition: height .24s var(--ease), opacity .24s var(--ease); }
-.day-body.on { opacity: 1; }
-.day-body[hidden] { display: none; }
-.day-in { padding: 0 0 12px; font: var(--type-reading); }
-.day-in p { margin: 0 0 12px; }
-.day-in p:last-child { margin-bottom: 0; }
 
 /* resume */
 .popup[open] { flex-direction: column; gap: 8px; }

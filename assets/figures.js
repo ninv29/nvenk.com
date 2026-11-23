@@ -1,4 +1,4 @@
-/* figures.js: the home page figure, the three interactive figures, the rotating contact link, the bio notes, the writings list, the photo carousel, the back link, and the footer clock.
+/* figures.js: the home page figure, the three interactive figures, the rotating contact link, the bio notes, the photo carousel, the back link, and the footer clock.
    All data here is synthetic and generated in the browser. */
 (function () {
   "use strict";
@@ -608,56 +608,6 @@
     el.textContent = years + (years === 1 ? " year" : " years") + " and " + days + (days === 1 ? " day" : " days");
   }
   updateAge();
-
-  // Writings: hovering an entry opens it for as long as the cursor stays; clicking keeps it open.
-  $$("[data-days]").forEach(function (list) {
-    var still = null, closers = [], days = $$(".day", list);
-    days.forEach(function (day, i) {
-      // Numbered from the oldest piece, which sits at the bottom of the list.
-      var count = days.length - i, number = document.createElement("span");
-      number.className = "day-num";
-      number.textContent = (count < 10 ? "0" : "") + count + " /";
-      $(".day-head", day).prepend(number, " ");
-      var head = $(".day-head", day), body = $(".day-body", day);
-      var state = { open: false, settle: 0 }, hovering = false, pinned = false;
-
-      function apply(e) {
-        var next = pinned || hovering;
-        if (next === state.open) return;
-        state.open = next;
-        // Remember the cursor, so a row that slides under a still cursor doesn't open.
-        if (e) still = { x: e.clientX, y: e.clientY };
-        slide(body, state);
-        head.setAttribute("aria-expanded", String(next));
-      }
-      day.addEventListener("pointerenter", function (e) {
-        if (e.pointerType !== "mouse" || (still && still.x === e.clientX && still.y === e.clientY)) return;
-        hovering = true; apply(e);
-      });
-      day.addEventListener("pointerleave", function (e) {
-        if (e.pointerType !== "mouse") return;
-        hovering = false; apply(e);
-      });
-      head.addEventListener("click", function () { pinned = !pinned; apply(); });
-      body.addEventListener("click", function () {
-        if (!pinned && String(window.getSelection()) === "") { pinned = true; apply(); }
-      });
-      closers.push(function (e) {
-        if (e.type === "click" && days.some(function (d) { return d.contains(e.target); })) return;
-        var held = pinned;
-        pinned = false;
-        if (e.type === "keydown") hovering = false;
-        apply();
-        return held;
-      });
-    });
-    document.addEventListener("click", function (e) { closers.forEach(function (close) { close(e); }); });
-    document.addEventListener("keydown", function (e) {
-      if (e.key !== "Escape") return;
-      // A held-open piece takes this press, so the next one is what leaves the page.
-      if (closers.map(function (close) { return close(e); }).some(Boolean)) e.preventDefault();
-    });
-  });
 
   // Photo carousel. Offsets are in photos from the center. Photos are one size until hovered.
   function Reel(reel) {
