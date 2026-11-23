@@ -67,11 +67,12 @@ a:hover { text-decoration-color: currentColor; }
 
 /* links into the interactive figures */
 a.fig-link {
+  font-style: italic;
   color: var(--ink-2);
   text-decoration: underline dotted 1.5px;
   text-decoration-color: var(--accent);
 }
-a.fig-link:hover { color: var(--accent); text-decoration-style: solid; text-decoration-thickness: 1px; text-decoration-color: currentColor; }
+a.fig-link:hover { font-weight: 700; color: var(--accent); text-decoration-style: solid; text-decoration-thickness: 1px; text-decoration-color: currentColor; }
 
 /* home */
 
@@ -98,12 +99,9 @@ canvas, .plate svg { animation: appear .24s var(--ease); }
 .hero + .sec { margin-top: 32px; }
 .sec > h2 { font: var(--type-title); letter-spacing: -.005em; color: var(--ink); padding-top: 20px; border-top: 1px solid var(--rule); margin-bottom: 12px; }
 
-.entry { margin: 0 0 16px; transition: opacity .2s var(--ease-soft); }
+.entry { margin: 0 0 16px; }
 .date { transition: color .2s var(--ease-soft); }
 .entry:hover .date { color: var(--ink-2); }
-@media (hover: hover) {
-  .sec:has(.entry:hover) .entry:not(:hover) { opacity: .55; }
-}
 .entry:last-child { margin-bottom: 0; }
 .entry-head { display: flex; justify-content: space-between; align-items: baseline; gap: 0 16px; }
 .org { font: var(--type-heading); color: var(--ink); min-width: 0; }
@@ -112,6 +110,9 @@ canvas, .plate svg { animation: appear .24s var(--ease); }
 .role { color: var(--ink-2); }
 
 .org .at { font-weight: 400; color: var(--ink-2); }
+
+/* links in the bio and contact line turn italic under the cursor */
+.bio .reveal:hover, .bio a[href="photos.html"]:hover, .rot a:hover, .check .mail:hover { font-style: italic; }
 
 /* contact */
 .check { margin: 0; font: var(--type-prose); color: var(--ink-2); }

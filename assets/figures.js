@@ -1030,7 +1030,8 @@
     measure.setAttribute("aria-hidden", "true");
     wrap.appendChild(measure);
 
-    function widthOf(text) { measure.textContent = text; return Math.ceil(measure.getBoundingClientRect().width); }
+    // Measured in the link's current style, since it turns italic under the cursor.
+    function widthOf(text) { measure.style.fontStyle = getComputedStyle(a).fontStyle; measure.textContent = text; return Math.ceil(measure.getBoundingClientRect().width); }
     function letters(text, cls) {
       var box = document.createElement("span");
       box.setAttribute("aria-hidden", "true");
@@ -1073,6 +1074,7 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
     ["pointerenter", "focusin"].forEach(function (ev) { wrap.addEventListener(ev, function () { paused = true; }); });
     ["pointerleave", "focusout"].forEach(function (ev) { wrap.addEventListener(ev, function () { paused = false; }); });
+    ["pointerenter", "pointerleave"].forEach(function (ev) { a.addEventListener(ev, function () { requestAnimationFrame(fit); }); });
     setTimeout(tick, 2000);
   }
   $$("[data-rotate]").forEach(Rotator);
