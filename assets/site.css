@@ -113,15 +113,22 @@ canvas, .plate svg { animation: appear .24s var(--ease); }
 
 .org .at { font-weight: 400; color: var(--ink-2); }
 
-/* Links that turn italic under the cursor (set up in figures.js). An upright and an italic copy sit on top of each
-   other and crossfade, leaning as they go, while the width eases between the two, so the words after it slide over. */
-.lean { display: inline-grid; width: var(--w-up); text-decoration: inherit; transition: width .45s var(--ease-out); }
-.lean > span { grid-area: 1 / 1; justify-self: start; white-space: nowrap; text-decoration: inherit; transform-origin: 0 75%; transition: opacity .32s var(--ease-soft), transform .45s var(--ease-out); }
-.lean-it { font-style: italic; opacity: 0; transform: skewX(8deg); }
-[data-lean]:hover .lean { width: var(--w-it); }
-[data-lean]:hover .lean-up { opacity: 0; transform: skewX(-8deg); }
-[data-lean]:hover .lean-it { opacity: 1; transform: none; }
-.lean.measuring, .lean.measuring > span { transition: none; transform: none; }
+/* Links that turn italic under the cursor (set up in figures.js). Each letter sits in a slot with an upright and an
+   italic copy. On hover the slot eases to the italic letter's width while the copies crossfade and lean together;
+   the incoming copy fades in faster than the outgoing one fades out, so the letter never looks faint. */
+.lean { display: inline-block; position: relative; white-space: nowrap; text-decoration: inherit; }
+/* The underline layer's letters are transparent, so its underline takes the link's color from figures.js. */
+.lean-line { position: absolute; left: 0; top: 0; color: transparent; white-space: pre; text-decoration: inherit; pointer-events: none; transform-origin: 0 0; transition: transform .45s var(--ease-out), text-decoration-color .2s var(--ease); }
+[data-lean]:hover .lean-line, [data-lean][aria-expanded="true"] .lean-line { text-decoration-color: var(--lean-ink); }
+.lean-probe { position: absolute; left: 0; top: 0; visibility: hidden; white-space: pre; }
+.lg { display: inline-grid; width: var(--a-up); transition: width .45s var(--ease-out); }
+.lg > span { grid-area: 1 / 1; justify-self: start; white-space: pre; transform-origin: 0 75%; transition: opacity .28s var(--ease-soft), transform .45s var(--ease-out); }
+.lg-it { font-style: italic; opacity: 0; transform: skewX(10deg); transition-duration: .45s; }
+[data-lean]:hover .lg, .rot a.lean-on .lg { width: var(--a-it); }
+[data-lean]:hover .lean-line { transform: scaleX(var(--to-it)); }
+[data-lean]:hover .lg-up, .rot a.lean-on .lg-up { opacity: 0; transform: skewX(-10deg); transition-duration: .45s; }
+[data-lean]:hover .lg-it, .rot a.lean-on .lg-it { opacity: 1; transform: none; transition-duration: .28s, .45s; }
+.lean.measuring .lg, .lean.measuring .lg > span, .lean.measuring .lean-line { transition: none; }
 
 /* contact */
 .check { margin: 0; font: var(--type-prose); color: var(--ink-2); }
@@ -141,10 +148,6 @@ canvas, .plate svg { animation: appear .24s var(--ease); }
 .rot .l { display: inline-block; transition: transform .38s var(--ease), opacity .3s var(--ease); transition-delay: calc(var(--i) * 16ms); }
 .rot .l.pre { transform: translateY(-.45em); opacity: 0; }
 .rot .l.out { transform: translateY(.45em); opacity: 0; transition-duration: .24s, .2s; transition-delay: calc(var(--i) * 8ms); }
-.rot a > span { display: inline-block; transform-origin: 0 75%; transition: opacity .32s var(--ease-soft), transform .45s var(--ease-out); }
-.rot .rot-it { position: absolute; left: 0; top: 0; white-space: nowrap; font-style: italic; opacity: 0; transform: skewX(8deg); pointer-events: none; }
-.rot a.lean-on > span:not(.rot-it):not(.rot-old) { opacity: 0; transform: skewX(-8deg); }
-.rot a.lean-on > .rot-it { opacity: 1; transform: none; }
 .rot-old { position: absolute; left: 0; top: 0; white-space: nowrap; pointer-events: none; }
 .rot-measure { position: absolute; visibility: hidden; white-space: nowrap; pointer-events: none; }
 

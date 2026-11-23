@@ -1013,25 +1013,71 @@
     })();
   }
 
-  // Links that turn italic under the cursor, on devices that can hover. Each gets an upright and an italic copy;
-  // site.css crossfades them and eases the width between the two measured widths.
+  // Links that turn italic under the cursor, on devices that can hover. Every letter gets a slot holding an upright
+  // and an italic copy, starting where that letter sits in the word. On hover each slot eases from the upright
+  // letter's width to the italic one's while its two copies crossfade (site.css), so each letter changes in place and
+  // the word, and the text after it, follow. The underline is one line that stretches to the new width.
   var canHover = window.matchMedia("(hover: hover)").matches;
+  function glyph(ch) {
+    var g = document.createElement("span"), up = document.createElement("span"), it = document.createElement("span");
+    g.className = "lg";
+    up.className = "lg-up";
+    it.className = "lg-it";
+    up.textContent = it.textContent = ch === " " ? "\u00a0" : ch;
+    g.append(up, it);
+    return g;
+  }
   function Lean(el) {
-    var text = el.textContent, box = document.createElement("span"), up = document.createElement("span"), it = document.createElement("span");
+    var text = el.textContent, chars = Array.from(text);
+    var box = document.createElement("span"), line = document.createElement("span"), probe = document.createElement("span");
     box.className = "lean";
-    up.className = "lean-up";
-    it.className = "lean-it";
-    it.setAttribute("aria-hidden", "true");
-    up.textContent = it.textContent = text;
-    box.append(up, it);
+    box.setAttribute("aria-hidden", "true");
+    line.className = "lean-line";
+    line.textContent = text;
+    probe.className = "lean-probe";
+    var slots = chars.map(function (ch) { var g = glyph(ch); box.appendChild(g); return g; });
+    box.appendChild(line);
     el.textContent = "";
     el.appendChild(box);
+    el.setAttribute("aria-label", text.replace(/\u00a0/g, " "));
     el.setAttribute("data-lean", "");
-    // Measured straight and without animating, so a late font load just snaps to the right widths.
+
+    // The character right after the link, which the font may tuck closer (like the period after a "y").
+    var after = el.nextSibling && el.nextSibling.nodeType === 3 ? Array.from(el.nextSibling.textContent)[0] || "" : "";
+    function widthOf(str) {
+      probe.style.fontStyle = "normal";
+      probe.textContent = str;
+      box.appendChild(probe);
+      var w = probe.getBoundingClientRect().width;
+      probe.remove();
+      return w;
+    }
+    // Where each letter starts in the word set upright or in italic, kerning included.
+    function advances(italic) {
+      probe.style.fontStyle = italic ? "italic" : "normal";
+      probe.textContent = text;
+      box.appendChild(probe);
+      var node = probe.firstChild, frame = probe.getBoundingClientRect(), range = document.createRange(), lefts = [], at = 0;
+      chars.forEach(function (ch) {
+        range.setStart(node, at);
+        range.setEnd(node, at + ch.length);
+        lefts.push(range.getBoundingClientRect().left - frame.left);
+        at += ch.length;
+      });
+      probe.remove();
+      return { total: frame.width, step: lefts.map(function (l, i) { return (i + 1 < lefts.length ? lefts[i + 1] : frame.width) - l; }) };
+    }
+    // Measured without animating, so a late font load just snaps to the right widths.
     function measure() {
       box.classList.add("measuring");
-      box.style.setProperty("--w-up", up.getBoundingClientRect().width + "px");
-      box.style.setProperty("--w-it", it.getBoundingClientRect().width + "px");
+      var up = advances(false), it = advances(true);
+      slots.forEach(function (g, i) {
+        g.style.setProperty("--a-up", up.step[i] + "px");
+        g.style.setProperty("--a-it", it.step[i] + "px");
+      });
+      box.style.setProperty("--to-it", it.total / up.total);
+      box.style.setProperty("--lean-ink", getComputedStyle(el).color);
+      box.style.marginRight = after.trim() ? widthOf(text + after) - up.total - widthOf(after) + "px" : "";
       void box.offsetWidth;
       box.classList.remove("measuring");
     }
@@ -1058,7 +1104,8 @@
     wrap.appendChild(measure);
 
     // Measured in italic while the link is under the cursor, since it turns italic then.
-    function widthOf(text) { measure.style.fontStyle = a.classList.contains("lean-on") ? "italic" : ""; measure.textContent = text; return Math.ceil(measure.getBoundingClientRect().width); }
+    function widthIn(text, italic) { measure.style.fontStyle = italic ? "italic" : ""; measure.textContent = text; return measure.getBoundingClientRect().width; }
+    function widthOf(text) { return Math.ceil(widthIn(text, a.classList.contains("lean-on"))); }
     function letters(text, cls) {
       var box = document.createElement("span");
       box.setAttribute("aria-hidden", "true");
@@ -1066,10 +1113,19 @@
         var l = document.createElement("span");
         l.className = cls ? "l " + cls : "l";
         l.style.setProperty("--i", i);
-        l.textContent = ch;
+        if (canHover) l.appendChild(glyph(ch)); else l.textContent = ch;
         box.appendChild(l);
       });
+      if (canHover) sizeLetters(box);
       return box;
+    }
+    // Each letter's upright and italic widths, for the italic hover.
+    function sizeLetters(box) {
+      $$(".lg", box).forEach(function (g) {
+        var ch = g.firstChild.textContent;
+        g.style.setProperty("--a-up", widthIn(ch, false) + "px");
+        g.style.setProperty("--a-it", widthIn(ch, true) + "px");
+      });
     }
     function fit() { a.style.width = widthOf(PLATFORMS[idx].label) + "px"; }
 
@@ -1098,21 +1154,12 @@
     a.href = PLATFORMS[0].href;
     a.setAttribute("aria-label", PLATFORMS[0].label);
     fit();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (canHover) sizeLetters(a); fit(); });
     ["pointerenter", "focusin"].forEach(function (ev) { wrap.addEventListener(ev, function () { paused = true; }); });
     ["pointerleave", "focusout"].forEach(function (ev) { wrap.addEventListener(ev, function () { paused = false; }); });
-    // Under the cursor, an italic copy of the word crossfades in over the upright one (styles in site.css).
-    var it = null;
+    // Under the cursor, the letters turn italic the same way as the other links (styles in site.css).
     function lean(on) {
-      if (on) {
-        if (!it) { it = document.createElement("span"); it.className = "rot-it"; it.setAttribute("aria-hidden", "true"); }
-        it.textContent = PLATFORMS[idx].label;
-        if (!it.parentNode) { a.appendChild(it); void it.offsetWidth; }
-        a.classList.add("lean-on");
-      } else {
-        a.classList.remove("lean-on");
-        setTimeout(function () { if (it && !a.classList.contains("lean-on")) it.remove(); }, 460);
-      }
+      a.classList.toggle("lean-on", on);
       fit();
     }
     if (canHover) {
