@@ -1013,6 +1013,33 @@
     })();
   }
 
+  // Links that turn italic under the cursor, on devices that can hover. Each gets an upright and an italic copy;
+  // site.css crossfades them and eases the width between the two measured widths.
+  var canHover = window.matchMedia("(hover: hover)").matches;
+  function Lean(el) {
+    var text = el.textContent, box = document.createElement("span"), up = document.createElement("span"), it = document.createElement("span");
+    box.className = "lean";
+    up.className = "lean-up";
+    it.className = "lean-it";
+    it.setAttribute("aria-hidden", "true");
+    up.textContent = it.textContent = text;
+    box.append(up, it);
+    el.textContent = "";
+    el.appendChild(box);
+    el.setAttribute("data-lean", "");
+    // Measured straight and without animating, so a late font load just snaps to the right widths.
+    function measure() {
+      box.classList.add("measuring");
+      box.style.setProperty("--w-up", up.getBoundingClientRect().width + "px");
+      box.style.setProperty("--w-it", it.getBoundingClientRect().width + "px");
+      void box.offsetWidth;
+      box.classList.remove("measuring");
+    }
+    measure();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+  }
+  if (canHover) $$(".bio .reveal, .bio a[href='photos.html'], .lead a[href*='nithinsphotography'], .check .mail").forEach(Lean);
+
   // Assembled here so the address is not in the page source for scrapers.
   $$("[data-mail]").forEach(function (a) { a.href = "mailto:" + ["nithin", "venkatramanan"].join("_") + "@" + ["brown", "edu"].join("."); });
 
@@ -1030,8 +1057,8 @@
     measure.setAttribute("aria-hidden", "true");
     wrap.appendChild(measure);
 
-    // Measured in the link's current style, since it turns italic under the cursor.
-    function widthOf(text) { measure.style.fontStyle = getComputedStyle(a).fontStyle; measure.textContent = text; return Math.ceil(measure.getBoundingClientRect().width); }
+    // Measured in italic while the link is under the cursor, since it turns italic then.
+    function widthOf(text) { measure.style.fontStyle = a.classList.contains("lean-on") ? "italic" : ""; measure.textContent = text; return Math.ceil(measure.getBoundingClientRect().width); }
     function letters(text, cls) {
       var box = document.createElement("span");
       box.setAttribute("aria-hidden", "true");
@@ -1074,7 +1101,24 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
     ["pointerenter", "focusin"].forEach(function (ev) { wrap.addEventListener(ev, function () { paused = true; }); });
     ["pointerleave", "focusout"].forEach(function (ev) { wrap.addEventListener(ev, function () { paused = false; }); });
-    ["pointerenter", "pointerleave"].forEach(function (ev) { a.addEventListener(ev, function () { requestAnimationFrame(fit); }); });
+    // Under the cursor, an italic copy of the word crossfades in over the upright one (styles in site.css).
+    var it = null;
+    function lean(on) {
+      if (on) {
+        if (!it) { it = document.createElement("span"); it.className = "rot-it"; it.setAttribute("aria-hidden", "true"); }
+        it.textContent = PLATFORMS[idx].label;
+        if (!it.parentNode) { a.appendChild(it); void it.offsetWidth; }
+        a.classList.add("lean-on");
+      } else {
+        a.classList.remove("lean-on");
+        setTimeout(function () { if (it && !a.classList.contains("lean-on")) it.remove(); }, 460);
+      }
+      fit();
+    }
+    if (canHover) {
+      a.addEventListener("pointerenter", function () { lean(true); });
+      a.addEventListener("pointerleave", function () { lean(false); });
+    }
     setTimeout(tick, 2000);
   }
   $$("[data-rotate]").forEach(Rotator);
